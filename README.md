@@ -39,7 +39,6 @@ pm2 restart hydrooj
 2. 勾选「启用 AI 对话」。
 3. 对话模型默认 `deepseek-flash`；二次校验别名为 `deepseek_pro`，映射到真实模型 `deepseek-flash`（官方没有 `deepseek_pro` 这个模型名，映射在插件内部完成）。
 4. 填写 API Key 并保存。Key 不回显，刷新后只显示 `sk-****abcd`。
-5. 也可在服务器上设置环境变量 `HYDRO_AI_DEEPSEEK_KEY`，优先级高于页面填写。
 
 ## 可用工具
 
