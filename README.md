@@ -10,7 +10,7 @@
 - Node v24.14.0 / hydrooj 5.0.0-beta.18 / @hydrooj/ui-default 4.58.0-beta.21
 - DeepSeek API Key（官方当前模型：`deepseek-flash`）
 
-## 3. 安装 / 更新
+##  安装 / 更新
 
 ```bash
 mkdir -p /root/.hydro/addons
