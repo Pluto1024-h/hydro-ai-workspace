@@ -1,0 +1,49 @@
+{% extends "manage_base.html" %}
+
+{% block manage_content %}
+<style>
+.aiws-bank{--b:#e2e8f0;--muted:#64748b;--accent:#4f46e5;max-width:1080px;margin:0 auto;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.aiws-bank *{box-sizing:border-box}
+.aiws-bank h1{font-size:20px;margin:0 0 6px}
+.aiws-bank .sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+.aiws-bank .back{display:inline-block;margin-bottom:14px;color:var(--accent);text-decoration:none;font-size:13px}
+.aiws-bank table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--b);border-radius:10px;overflow:hidden;font-size:13px}
+.aiws-bank th,.aiws-bank td{padding:9px 12px;border-bottom:1px solid var(--b);text-align:left;vertical-align:top}
+.aiws-bank th{background:#f8fafc;color:#475569;font-weight:650}
+.aiws-bank tr:last-child td{border-bottom:0}
+.aiws-bank .tag{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:999px;padding:2px 8px;font-size:11px;margin:2px 4px 2px 0}
+.aiws-bank .muted{color:var(--muted)}
+.aiws-bank .pager{display:flex;gap:10px;margin-top:16px;align-items:center}
+.aiws-bank .pager a{color:var(--accent);text-decoration:none;border:1px solid var(--b);border-radius:8px;padding:6px 12px;background:#fff}
+.aiws-bank .empty{padding:40px;text-align:center;color:var(--muted);background:#fff;border:1px dashed var(--b);border-radius:10px}
+@media(max-width:760px){.aiws-bank th:nth-child(5),.aiws-bank td:nth-child(5){display:none}}
+</style>
+<div class="aiws-bank">
+  <a class="back" href="/manage/ai-workspace">← 返回工作区</a>
+  <h1>题库浏览</h1>
+  <p class="sub">按题号倒序列出题目。完整题面、查重与标签优化请在工作区让 AI 处理；任何修改都必须先在「修改清单」里核对确认。</p>
+  {% if problems and problems.length %}
+  <table>
+    <thead><tr><th>题号</th><th>标题</th><th>标签</th><th>难度</th><th>提交/AC</th></tr></thead>
+    <tbody>
+      {% for p in problems %}
+      <tr>
+        <td>{{ p.pid }}</td>
+        <td>{{ p.title }}</td>
+        <td>{% for t in p.tags %}<span class="tag">{{ t }}</span>{% endfor %}{% if not p.tags.length %}<span class="muted">无</span>{% endif %}</td>
+        <td>{{ p.difficulty or '—' }}</td>
+        <td>{{ p.nSubmit or 0 }} / {{ p.nAccept or 0 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager">
+    {% if prevOffset !== null %}<a href="/manage/ai-workspace/problems?offset={{ prevOffset }}">← 上一页</a>{% endif %}
+    <span class="muted">偏移 {{ offset }}</span>
+    {% if nextOffset !== null %}<a href="/manage/ai-workspace/problems?offset={{ nextOffset }}">下一页 →</a>{% endif %}
+  </div>
+  {% else %}
+  <div class="empty">题库为空，或当前没有可浏览的题目。</div>
+  {% endif %}
+</div>
+{% endblock %}

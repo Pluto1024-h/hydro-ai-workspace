@@ -1,0 +1,268 @@
+#ai-workspace-root.aiws {
+  --aiws-border: #d8dee9;
+  --aiws-bg: #ffffff;
+  --aiws-soft: #f5f7fa;
+  --aiws-text: #24292f;
+  --aiws-muted: #6b7280;
+  --aiws-accent: #2563eb;
+  color: var(--aiws-text);
+  background: var(--aiws-bg);
+}
+
+#ai-workspace-root .aiws__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+#ai-workspace-root .aiws__sub,
+#ai-workspace-root .aiws__muted,
+#ai-workspace-root .aiws__hint {
+  color: var(--aiws-muted);
+  font-size: 13px;
+}
+
+#ai-workspace-root .aiws__top-actions {
+  display: flex;
+  gap: 8px;
+}
+
+#ai-workspace-root .aiws__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
+  align-items: start;
+}
+
+#ai-workspace-root .aiws__chat {
+  border: 1px solid var(--aiws-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  min-height: 560px;
+  overflow: hidden;
+}
+
+#ai-workspace-root .aiws__chat-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--aiws-soft);
+  border-bottom: 1px solid var(--aiws-border);
+}
+
+#ai-workspace-root .aiws__messages {
+  flex: 1;
+  min-height: 380px;
+  max-height: 62vh;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#ai-workspace-root .aiws__empty {
+  margin: auto;
+  color: var(--aiws-muted);
+  font-size: 14px;
+}
+
+#ai-workspace-root .aiws__bubble {
+  max-width: 88%;
+  border-radius: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--aiws-border);
+  background: var(--aiws-bg);
+}
+
+#ai-workspace-root .aiws__bubble--user {
+  align-self: flex-end;
+  background: #eef4ff;
+  border-color: #c7d9ff;
+}
+
+#ai-workspace-root .aiws__bubble--assistant {
+  align-self: flex-start;
+}
+
+#ai-workspace-root .aiws__bubble--tool {
+  align-self: flex-start;
+  background: #fff7e6;
+  border-color: #ffd591;
+  font-size: 13px;
+}
+
+#ai-workspace-root .aiws__bubble-role {
+  font-size: 12px;
+  color: var(--aiws-muted);
+  margin-bottom: 4px;
+}
+
+#ai-workspace-root .aiws__bubble-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+}
+
+#ai-workspace-root .aiws__chip,
+#ai-workspace-root .aiws__card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  align-self: flex-start;
+  max-width: 92%;
+  padding: 6px 10px;
+  border: 1px dashed var(--aiws-border);
+  border-radius: 6px;
+  background: var(--aiws-soft);
+  font-size: 13px;
+}
+
+#ai-workspace-root .aiws__chip-name,
+#ai-workspace-root .aiws__card-tag {
+  color: var(--aiws-accent);
+  font-weight: 600;
+}
+
+#ai-workspace-root .aiws__chip-args,
+#ai-workspace-root .aiws__card-text {
+  color: var(--aiws-muted);
+  overflow-wrap: anywhere;
+}
+
+#ai-workspace-root .aiws__card-btn {
+  margin-left: auto;
+  min-height: 32px;
+}
+
+#ai-workspace-root .aiws__composer {
+  border-top: 1px solid var(--aiws-border);
+  padding: 10px 12px 12px;
+  background: var(--aiws-soft);
+}
+
+#ai-workspace-root .aiws__composer textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  margin: 8px 0;
+  padding: 8px;
+  border: 1px solid var(--aiws-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--aiws-text);
+}
+
+#ai-workspace-root .aiws__composer-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+#ai-workspace-root .aiws__side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#ai-workspace-root .aiws__panel {
+  border: 1px solid var(--aiws-border);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--aiws-bg);
+}
+
+#ai-workspace-root .aiws__panel h2 {
+  font-size: 15px;
+  margin: 0 0 8px;
+}
+
+#ai-workspace-root .aiws__panel--disabled {
+  opacity: 0.7;
+}
+
+#ai-workspace-root .aiws__audit-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--aiws-soft);
+  padding: 5px 0;
+}
+
+#ai-workspace-root .aiws__audit-time {
+  color: var(--aiws-muted);
+}
+
+#ai-workspace-root .aiws__modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+#ai-workspace-root .aiws__modal[hidden] {
+  display: none;
+}
+
+#ai-workspace-root .aiws__modal-box {
+  width: min(820px, 96vw);
+  max-height: 86vh;
+  background: #fff;
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+#ai-workspace-root .aiws__modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+#ai-workspace-root .aiws__modal-body,
+#ai-workspace-root #aiws-modal-body {
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--aiws-soft);
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 12px;
+  max-height: 70vh;
+}
+
+#ai-workspace-root .aiws__sudo-link {
+  display: inline-block;
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  #ai-workspace-root .aiws__layout {
+    grid-template-columns: 1fr;
+  }
+
+  #ai-workspace-root .aiws__side {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  #ai-workspace-root .aiws__panel {
+    flex: 1 1 240px;
+  }
+
+  #ai-workspace-root .aiws__chat {
+    min-height: 70vh;
+  }
+}

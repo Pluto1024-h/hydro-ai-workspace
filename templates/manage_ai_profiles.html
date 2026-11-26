@@ -1,0 +1,43 @@
+{% extends "manage_base.html" %}
+
+{% block manage_content %}
+<style>
+.aiws-profiles {
+  --b:#e2e8f0; --muted:#64748b; --accent:#4f46e5;
+  max-width:960px; margin:0 auto; color:#0f172a;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+.aiws-profiles *{box-sizing:border-box}
+.aiws-profiles h1{font-size:20px;margin:0 0 4px}
+.aiws-profiles .sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+.aiws-profiles .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.aiws-profiles .card{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--b);border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(15,23,42,.04);transition:transform .1s,box-shadow .1s}
+.aiws-profiles .card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(15,23,42,.1);text-decoration:none}
+.aiws-profiles .card .name{font-size:15px;font-weight:650}
+.aiws-profiles .card .uid{color:var(--muted);font-size:12px;margin-left:6px}
+.aiws-profiles .badge{display:inline-block;margin-top:10px;padding:3px 10px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:12px;font-weight:600}
+.aiws-profiles .score{float:right;color:var(--accent);font-weight:700}
+.aiws-profiles .time{color:var(--muted);font-size:11px;margin-top:10px}
+.aiws-profiles .empty{background:#fff;border:1px dashed var(--b);border-radius:12px;padding:40px;text-align:center;color:var(--muted)}
+.aiws-profiles .back{display:inline-block;margin-bottom:16px;color:var(--accent);text-decoration:none;font-size:13px}
+</style>
+<div class="aiws-profiles">
+  <a class="back" href="/manage/ai-workspace">← 返回工作区</a>
+  <h1>用户档案</h1>
+  <p class="sub">在工作区里让 AI 分析某个用户并生成档案后，会显示在这里。头像、邮箱等敏感信息不在档案内。</p>
+  {% if profiles and profiles.length %}
+  <div class="grid">
+    {% for p in profiles %}
+    <a class="card" href="/manage/ai-workspace/profile/{{ p.uid }}">
+      <span class="name">{{ p.uname }}</span><span class="uid">UID {{ p.uid }}</span>
+      <span class="score">{{ p.ability.score or 0 }} 分</span>
+      <span class="badge">{{ p.ability.level or '未评估' }}</span>
+      <div class="time">更新于 {{ p.updatedAt | default('') }}</div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">还没有档案。去工作区输入「分析用户 123 并建立档案」试试。</div>
+  {% endif %}
+</div>
+{% endblock %}

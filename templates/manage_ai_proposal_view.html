@@ -1,0 +1,245 @@
+{% extends "manage_base.html" %}
+
+{% block manage_content %}
+<style>
+.aiws-prop{--b:#e2e8f0;--muted:#64748b;--danger:#dc2626;max-width:1000px;margin:0 auto;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.aiws-prop *{box-sizing:border-box}
+.aiws-prop h1{font-size:20px;margin:0 0 6px}
+.aiws-prop .sub,.aiws-prop .muted{color:var(--muted);font-size:13px}
+.aiws-prop .back{display:inline-block;margin-bottom:14px;color:#4f46e5;text-decoration:none;font-size:13px}
+.aiws-prop .notice{padding:10px 14px;border-radius:8px;margin:10px 0;font-size:13px}
+.aiws-prop .notice.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.aiws-prop .warn{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:10px;padding:12px 14px;font-size:13px;margin:14px 0}
+.aiws-prop .box{background:#fff;border:1px solid var(--b);border-radius:12px;padding:16px;margin:14px 0}
+.aiws-prop .pickbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 14px;background:#f8fafc;border:1px solid var(--b);border-radius:10px;margin:14px 0;font-size:13px}
+.aiws-prop .pickbar label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:600}
+.aiws-prop .pickbar .count{color:var(--muted)}
+.aiws-prop .pickbar .count strong{color:#4f46e5;font-size:15px}
+.aiws-prop .pickbar button{font-family:inherit;font-size:12px;cursor:pointer;padding:5px 12px;border-radius:7px;border:1px solid var(--b);background:#fff;color:#334155}
+.aiws-prop table{width:100%;border-collapse:collapse;font-size:13px}
+.aiws-prop th,.aiws-prop td{padding:9px 10px;border-bottom:1px solid var(--b);text-align:left;vertical-align:top}
+.aiws-prop th{background:#f8fafc;color:#475569}
+.aiws-prop th.pick,.aiws-prop td.pick{width:42px;text-align:center}
+.aiws-prop input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:#4f46e5}
+.aiws-prop tr.off{opacity:.5;background:#f8fafc}
+.aiws-prop code{font-size:12px;color:#3730a3}
+.aiws-prop .mem{font-size:12px;color:var(--muted);margin-top:3px}
+.aiws-prop .mem.del{color:var(--danger)}
+.aiws-prop .actions{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.aiws-prop button{font-family:inherit;font-size:13px;cursor:pointer;padding:9px 16px;border-radius:8px;border:1px solid var(--b);background:#fff;color:#334155}
+.aiws-prop button.confirm{background:var(--danger);border-color:var(--danger);color:#fff;font-weight:650}
+.aiws-prop button:disabled{opacity:.5;cursor:not-allowed}
+.aiws-prop .token{font-size:11px;word-break:break-all;color:var(--muted)}
+.aiws-prop .resultbox{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;border-radius:10px;padding:12px 14px;font-size:13px;margin:14px 0}
+.aiws-prop .pkg{background:#fff;border:1px solid var(--b);border-radius:12px;padding:16px;margin:14px 0}
+.aiws-prop .pkg h2{font-size:15px;margin:0 0 8px}
+.aiws-prop .pkg .params{background:#f1f5f9;border-radius:8px;padding:9px 12px;font-size:12px;color:#334155;margin-bottom:12px}
+.aiws-prop .pkg details{border:1px solid var(--b);border-radius:8px;margin:8px 0;background:#fcfcfd}
+.aiws-prop .pkg summary{cursor:pointer;padding:9px 12px;font-size:13px;font-weight:600;color:#3730a3;user-select:none}
+.aiws-prop .pkg pre{margin:0;padding:12px;border-top:1px solid var(--b);background:#f8fafc;white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.55;max-height:420px;overflow:auto;color:#0f172a}
+.aiws-prop .pkg .meta{font-size:12px;color:var(--muted);margin-top:8px}
+.aiws-prop .pkg .nocode{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:8px;padding:9px 12px;font-size:12px}
+.aiws-prop .datatable{border-top:1px solid var(--b);padding:0}
+.aiws-prop .datatable table{width:100%;border-collapse:collapse;font-size:12px}
+.aiws-prop .datatable th{background:#f8fafc;color:#475569;padding:7px 10px;text-align:left;border-bottom:1px solid var(--b)}
+.aiws-prop .datatable td{padding:7px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+.aiws-prop .datatable code{font-size:11px;color:#334155;word-break:break-all}
+.aiws-prop .cat{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}
+.aiws-prop .cat-boundary{background:#eff6ff;color:#1d4ed8}
+.aiws-prop .cat-extreme{background:#fef2f2;color:#b91c1c}
+.aiws-prop .cat-tricky{background:#fff7ed;color:#c2410c}
+.aiws-prop .cat-normal{background:#f1f5f9;color:#475569}
+.aiws-prop .cat-special{background:#f0fdf4;color:#15803d}
+</style>
+<div class="aiws-prop">
+  <a class="back" href="/manage/ai-workspace/proposals">← 返回清单列表</a>
+  {% if notice %}<div class="notice error">{{ notice.message }}</div>{% endif %}
+  {% if not proposal %}
+    <div class="box muted">清单不存在，或不属于你。</div>
+  {% else %}
+  <h1>{{ proposal.summary }}</h1>
+  <p class="sub">类型 {{ proposal.kind }} · 状态 <strong>{{ proposal.status }}</strong> · {{ proposal.items.length }} 项 · 有效期至 {{ proposal.expiresAtText }}</p>
+
+  {% if proposal.kind === 'delete_duplicates' %}
+  <div class="warn"><strong>⚠️ 高危操作：</strong>每组保留第 1 题、删除其余题目，并<strong>同时删除其测试数据，不可恢复</strong>。勾选以「组」为单位，取消勾选即整组不动。请逐组核对。</div>
+  {% elif proposal.kind === 'update_tags' %}
+  <div class="warn">确认后会用「建议标签」覆盖选中题目的标签。原标签已列在表中，请核对是否保留完整。取消勾选即该题目保持原样。</div>
+  {% else %}
+  {% if items.length and items[0].pkgView and items[0].pkgView.isExisting %}
+  <div class="warn"><strong>⚠️ 将写入已有题目：</strong><strong>{{ items[0].pkgView.targetPid }}</strong>。确认后会把该题<strong>现有测试数据替换</strong>为下面这套分类数据（先写入新数据，成功后才清理多余旧文件，中途失败不会清空原题）。题面与标签不会改动。服务器会真实运行参考程序计算输出，并先用题面样例校验题解。</div>
+  {% else %}
+  <div class="warn"><strong>新增题目：</strong>确认后服务器会<strong>真实运行参考程序</strong>计算测试输出（不用 AI 编造答案），并先用题面样例校验题解正确性；校验不过则只保留题面样例。新建题目<strong>默认隐藏</strong>，需你在题目页核对并补数据后再公开。测试输出由服务器计算，但请你仍核对题面与样例是否与权威来源一致。</div>
+  {% endif %}
+  {% endif %}
+
+  {% if proposal.kind === 'add_problems' %}
+  {% for item in items %}
+  <div class="pkg">
+    <h2>{{ item.titleText }}</h2>
+    <div class="params">{{ item.pkgView.paramsText }}</div>
+    <div class="params">数据范围：{{ item.pkgView.constraintsText }}</div>
+    {% if not item.pkgView.hasCode %}<div class="nocode">未提供参考程序：将只入库题面样例，无法生成额外测试点。建议在对话里让 AI 补齐后再生成清单。</div>{% endif %}
+    <details open><summary>题面（Markdown 原文）</summary><pre>{{ item.pkgView.contentHtml | safe }}</pre></details>
+    <details><summary>参考程序（Python3，确认时由服务器执行）</summary><pre>{{ item.pkgView.codeHtml | safe }}</pre></details>
+    <details><summary>题面样例（校验基准，{{ item.pkgView.countsText }}）</summary><pre>{{ item.pkgView.sampleHtml | safe }}</pre></details>
+    <details open><summary>分类测试数据（{{ item.pkgView.countsText }}）</summary>
+      <div class="datatable">
+        <table>
+          <thead><tr><th style="width:40px">#</th><th style="width:64px">类别</th><th>测什么</th><th>输入预览</th></tr></thead>
+          <tbody>
+          {% for d in item.pkgView.dataRows %}
+            <tr>
+              <td>{{ d.no }}</td>
+              <td><span class="cat cat-{{ d.key }}">{{ d.category }}</span></td>
+              <td>{{ d.purpose }}</td>
+              <td><code>{{ d.preview }}</code></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% for d in item.pkgView.dataRows %}
+        {% if d.generated %}
+        <div style="padding:0 12px 8px">
+          <details><summary style="font-weight:500;color:#475569">#{{ d.no }} 生成器脚本（确认时运行产出输入）</summary><pre>{{ d.genCode | safe }}</pre></details>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </details>
+    <div class="meta">来源：{{ item.pkgView.sourceText }} · 说明：{{ item.pkgView.notesText }}</div>
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  {% if proposal.status === 'pending' and sudo %}
+  <div class="pickbar">
+    <label><input type="checkbox" id="aiws-check-all" checked> 全选</label>
+    <span class="count">已选 <strong id="aiws-sel-count">{{ items.length }}</strong> / {{ items.length }} 项</span>
+    <button type="button" id="aiws-invert">反选</button>
+    <span class="muted">只执行勾选的项目；未勾选的本次不做。</span>
+  </div>
+  {% endif %}
+
+  <div class="box">
+    <table>
+      <thead><tr>
+        {% if proposal.status === 'pending' and sudo %}<th class="pick">选</th>{% endif %}
+        <th>编号</th><th>标题 / 依据</th><th>原状态</th><th>拟改为</th>
+      </tr></thead>
+      <tbody>
+      {% for item in items %}
+        <tr class="aiws-row" data-idx="{{ item.idx }}">
+          {% if proposal.status === 'pending' and sudo %}
+          <td class="pick"><input type="checkbox" class="aiws-chk" value="{{ item.idx }}" checked></td>
+          {% endif %}
+          <td>{{ item.pidText }}</td>
+          <td>{{ item.titleText }}
+            {% if item.reason %}<br><span class="muted">{{ item.reason }}</span>{% endif %}
+            {% for m in item.memberLines %}<div class="mem {% if m.danger %}del{% endif %}">{{ m.action }} {{ m.pid }} {{ m.title }}</div>{% endfor %}
+          </td>
+          <td>{{ item.currentText }}</td>
+          <td><code>{{ item.targetText }}</code></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if proposal.status === 'pending' and sudo %}
+  <div class="actions">
+    <button type="button" class="confirm" id="aiws-confirm">{% if items.length and items[0].pkgView and items[0].pkgView.isExisting %}写入原题测试数据{% else %}执行选中项{% endif %}</button>
+    <button type="button" id="aiws-reject">拒绝此清单</button>
+    <span class="muted">本次会话身份已验证，确认时服务端会再次校验 sudo、令牌与勾选索引。</span>
+  </div>
+  <p class="token">令牌：<code>{{ proposal.token }}</code></p>
+  {% elif proposal.status === 'pending' %}
+  <div class="warn">当前 sudo 已过期，请返回工作区重新完成身份验证后再确认。</div>
+  {% else %}
+  <div class="resultbox">
+    该清单已处理（{{ proposal.status }}）。
+    {% if proposal.result %}
+      实际执行 {{ proposal.result.executed }} 项 · 成功 {{ proposal.result.ok }} · 失败 {{ proposal.result.failed }} · 跳过 {{ proposal.result.skipped }} 项。
+    {% endif %}
+    {% if resultLines and resultLines.length %}
+    <ul style="margin:8px 0 0;padding-left:18px;line-height:1.7">
+    {% for line in resultLines %}
+      <li>{{ line }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+  {% if skippedLines and skippedLines.length %}
+  <div class="box">
+    <strong>本次跳过的项目：</strong>
+    <ul style="margin:8px 0 0;padding-left:20px;font-size:13px">
+    {% for line in skippedLines %}
+      <li>{{ line }}</li>
+    {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  {% endif %}
+  {% endif %}
+</div>
+<script>
+(function(){
+  var id = '{{ proposal._id }}';
+  var token = '{{ proposal.token }}';
+  var checks = Array.prototype.slice.call(document.querySelectorAll('.aiws-chk'));
+  var all = document.getElementById('aiws-check-all');
+  var countEl = document.getElementById('aiws-sel-count');
+  var confirmBtn = document.getElementById('aiws-confirm');
+  function selected(){
+    return checks.filter(function(c){return c.checked;}).map(function(c){return Number(c.value);});
+  }
+  function refresh(){
+    var n = selected().length, total = checks.length;
+    if (countEl) countEl.textContent = String(n);
+    if (all) { all.checked = n === total && total > 0; all.indeterminate = n > 0 && n < total; }
+    if (confirmBtn) confirmBtn.disabled = n === 0;
+    checks.forEach(function(c){
+      var row = c.closest ? c.closest('tr') : null;
+      if (row) row.classList.toggle('off', !c.checked);
+    });
+  }
+  checks.forEach(function(c){ c.addEventListener('change', refresh); });
+  if (all) all.addEventListener('change', function(){
+    checks.forEach(function(c){ c.checked = all.checked; });
+    refresh();
+  });
+  var invert = document.getElementById('aiws-invert');
+  if (invert) invert.addEventListener('click', function(){
+    checks.forEach(function(c){ c.checked = !c.checked; });
+    refresh();
+  });
+  function post(path, body){
+    return fetch(path, {method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body||{})})
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, data:d}; }); });
+  }
+  refresh();
+  if (confirmBtn) confirmBtn.addEventListener('click', function(){
+    var sel = selected();
+    if (!sel.length) { alert('请至少勾选一项；若整单都不做请点“拒绝此清单”。'); return; }
+    var skipped = checks.length - sel.length;
+    if (!confirm('将执行勾选的 ' + sel.length + ' 项' + (skipped ? '，跳过 ' + skipped + ' 项（本次不做）' : '') + '。删除类操作不可恢复，请确认。')) return;
+    confirmBtn.disabled = true;
+    post('/-/ai-workspace/proposal/' + encodeURIComponent(id) + '/confirm', {token: token, selected: sel})
+      .then(function(res){
+        if (res.ok && res.data.ok) {
+          var r = res.data.result || {};
+          alert('执行完成：选中 ' + (r.executed || sel.length) + ' 项，成功 ' + (r.ok || 0) + ' 项，失败 ' + (r.failed || 0) + ' 项，跳过 ' + (r.skipped || 0) + ' 项。');
+          location.reload();
+        } else {
+          alert('执行失败：' + (res.data.error || '未知错误'));
+          confirmBtn.disabled = false;
+        }
+      }).catch(function(e){ alert('执行失败：' + e.message); confirmBtn.disabled = false; });
+  });
+  var rejectBtn = document.getElementById('aiws-reject');
+  if (rejectBtn) rejectBtn.addEventListener('click', function(){
+    post('/-/ai-workspace/proposal/' + encodeURIComponent(id) + '/reject', {})
+      .then(function(){ location.reload(); }).catch(function(e){ alert(e.message); });
+  });
+})();
+</script>
+{% endblock %}

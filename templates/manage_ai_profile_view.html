@@ -1,0 +1,135 @@
+{% extends "manage_base.html" %}
+
+{% block manage_content %}
+<style>
+.aiws-pv {
+  --b:#e2e8f0; --muted:#64748b; --accent:#4f46e5; --soft:#f8fafc;
+  max-width:1000px; margin:0 auto; color:#0f172a;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+.aiws-pv *{box-sizing:border-box}
+.aiws-pv .back{display:inline-block;margin-bottom:14px;color:var(--accent);text-decoration:none;font-size:13px}
+.aiws-pv .hero{background:linear-gradient(135deg,#312e81,#4f46e5 55%,#0ea5e9);color:#fff;border-radius:14px;padding:22px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.aiws-pv .hero h1{margin:0;font-size:20px}
+.aiws-pv .hero .meta{font-size:12px;opacity:.85;margin-top:6px}
+.aiws-pv .level{text-align:center;background:rgba(255,255,255,.14);border-radius:12px;padding:12px 20px}
+.aiws-pv .level .big{font-size:30px;font-weight:700}
+.aiws-pv .level .lbl{font-size:12px;opacity:.85}
+.aiws-pv .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:16px}
+.aiws-pv .panel{background:#fff;border:1px solid var(--b);border-radius:12px;padding:16px 18px;box-shadow:0 2px 10px rgba(15,23,42,.04)}
+.aiws-pv .panel.full{grid-column:1/-1}
+.aiws-pv h2{font-size:14px;margin:0 0 12px;color:#334155}
+.aiws-pv .stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--soft);font-size:13px}
+.aiws-pv .stat:last-child{border-bottom:0}
+.aiws-pv .stat b{color:var(--accent)}
+.aiws-pv table{width:100%;border-collapse:collapse;font-size:12px}
+.aiws-pv th,.aiws-pv td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--soft)}
+.aiws-pv th{color:var(--muted);font-weight:600}
+.aiws-pv .tag{display:inline-block;padding:2px 8px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:11px;margin:2px}
+.aiws-pv .bar{height:8px;border-radius:4px;background:#e2e8f0;overflow:hidden;margin-top:4px}
+.aiws-pv .bar>i{display:block;height:100%;background:var(--accent)}
+.aiws-pv .note{white-space:pre-wrap;line-height:1.7;font-size:13px;color:#334155}
+.aiws-pv .muted{color:var(--muted);font-size:12px}
+.aiws-pv .empty{background:#fff;border:1px dashed var(--b);border-radius:12px;padding:40px;text-align:center;color:var(--muted)}
+</style>
+<div class="aiws-pv">
+  <a class="back" href="/manage/ai-workspace/profiles">← 返回档案列表</a>
+  {% if profile %}
+  {% set ability = profile.ability or {} %}
+  {% set overview = profile.overview or {} %}
+  <div class="hero">
+    <div>
+      <h1>{{ profile.uname }} <span style="font-size:13px;opacity:.8">UID {{ profile.uid }}</span></h1>
+      <div class="meta">状态 {{ profile.status }} · 注册 {{ profile.registerAt }} · 最近登录 {{ profile.lastLoginAt }} · 分析窗口 {{ profile.analysisWindowDays }} 天</div>
+    </div>
+    <div class="level"><div class="big">{{ ability.score or 0 }}</div><div class="lbl">{{ ability.level or '未评估' }}</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>概况</h2>
+      <div class="stat"><span>提交次数</span><b>{{ overview.totalSubmissions or 0 }}</b></div>
+      <div class="stat"><span>通过次数</span><b>{{ overview.accepted or 0 }}</b></div>
+      <div class="stat"><span>AC 率</span><b>{{ overview.acRate or '0%' }}</b></div>
+      <div class="stat"><span>尝试题目</span><b>{{ overview.problemsTried or 0 }}</b></div>
+      <div class="stat"><span>通过题目</span><b>{{ overview.problemsSolved or 0 }}</b></div>
+      <div class="stat"><span>平均代码长度</span><b>{{ overview.avgCodeLength or 0 }} 字符</b></div>
+    </div>
+
+    <div class="panel">
+      <h2>实力评估依据</h2>
+      {% for r in ability.reasons or [] %}<div class="muted">· {{ r }}</div>{% endfor %}
+      <h2 style="margin-top:14px">难度覆盖</h2>
+      {% for k, v in (ability.difficultyCoverage or {}) %}
+      {% if v %}<div class="stat"><span>{{ k }}</span><b>{{ v }} 题</b></div>{% endif %}
+      {% endfor %}
+      {% if ability.strengthTags and ability.strengthTags.length %}<div style="margin-top:8px"><span class="muted">优势：</span>{% for t in ability.strengthTags %}<span class="tag">{{ t }}</span>{% endfor %}</div>{% endif %}
+      {% if ability.weaknessTags and ability.weaknessTags.length %}<div><span class="muted">薄弱：</span>{% for t in ability.weaknessTags %}<span class="tag">{{ t }}</span>{% endfor %}</div>{% endif %}
+    </div>
+
+    <div class="panel">
+      <h2>活跃时间分布（小时）</h2>
+      {% for h in (profile.studyTimeline.byHour or []) %}
+      <div class="stat"><span>{{ h.hour }} 时</span><b>{{ h.count }} 次</b></div>
+      {% endfor %}
+      {% if not profile.studyTimeline.byHour or not profile.studyTimeline.byHour.length %}<div class="muted">暂无数据</div>{% endif %}
+      <div class="stat" style="margin-top:8px"><span>活跃天数</span><b>{{ profile.studyTimeline.activeDays or 0 }} 天</b></div>
+    </div>
+
+    <div class="panel">
+      <h2>提交失败原因</h2>
+      {% for f in (profile.failureAnalysis.statusDistribution or []) %}
+      <div class="stat"><span>{{ f.status }}</span><b>{{ f.count }} 次 · {{ f.ratio }}</b></div>
+      <div class="bar"><i style="width:{{ f.ratio | replace('%','') }}%"></i></div>
+      {% endfor %}
+      {% if not profile.failureAnalysis.statusDistribution or not profile.failureAnalysis.statusDistribution.length %}<div class="muted">暂无数据</div>{% endif %}
+    </div>
+
+    <div class="panel">
+      <h2>代码习惯与常犯问题</h2>
+      {% for p in (profile.codeHabits.patterns or []) %}<div class="stat"><span>{{ p.pattern }}</span><b>{{ p.count }} 次</b></div>{% endfor %}
+      {% for f in (profile.codeHabits.features or []) %}<div class="stat"><span>{{ f.feature }}</span><b>{{ f.count }} 次</b></div>{% endfor %}
+      {% if not profile.codeHabits.patterns or not profile.codeHabits.patterns.length %}<div class="muted">暂无可识别特征</div>{% endif %}
+    </div>
+
+    <div class="panel">
+      <h2>语言分布</h2>
+      {% for l in (overview.languages or []) %}
+      <div class="stat"><span>{{ l.lang }}</span><b>{{ l.count }} 次 · AC {{ l.accepted }}</b></div>
+      {% endfor %}
+      {% if not overview.languages or not overview.languages.length %}<div class="muted">暂无数据</div>{% endif %}
+    </div>
+
+    <div class="panel full">
+      <h2>刷过的题目（按提交次数）</h2>
+      <table>
+        <thead><tr><th>题目</th><th>难度</th><th>提交</th><th>通过</th><th>标签</th><th>最近</th></tr></thead>
+        <tbody>
+        {% for p in (profile.solvedProblems or []) %}
+        <tr>
+          <td>{{ p.title }}</td>
+          <td>{{ p.difficultyLabel }}</td>
+          <td>{{ p.attempts }}</td>
+          <td>{{ p.accepted }}</td>
+          <td>{% for t in p.tags or [] %}<span class="tag">{{ t }}</span>{% endfor %}</td>
+          <td class="muted">{{ p.lastAt }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% if not profile.solvedProblems or not profile.solvedProblems.length %}<div class="muted">暂无刷题记录</div>{% endif %}
+    </div>
+
+    {% if profile.aiNotes %}
+    <div class="panel full">
+      <h2>AI 个性化结论</h2>
+      <div class="note">{{ profile.aiNotes }}</div>
+    </div>
+    {% endif %}
+  </div>
+  <p class="muted" style="margin-top:16px">档案生成于 {{ profile.generatedAt }}。档案只保存统计聚合与简短样本，不含任何完整提交代码。</p>
+  {% else %}
+  <div class="empty">UID {{ uid }} 还没有档案。去工作区输入「分析用户 {{ uid }} 并建立档案」生成。</div>
+  {% endif %}
+</div>
+{% endblock %}

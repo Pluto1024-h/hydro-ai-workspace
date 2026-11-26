@@ -1,0 +1,43 @@
+{% extends "manage_base.html" %}
+
+{% block manage_content %}
+<style>
+.aiws-props{--b:#e2e8f0;--muted:#64748b;--accent:#4f46e5;--danger:#dc2626;max-width:960px;margin:0 auto;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.aiws-props *{box-sizing:border-box}
+.aiws-props h1{font-size:20px;margin:0 0 6px}
+.aiws-props .sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+.aiws-props .back{display:inline-block;margin-bottom:14px;color:var(--accent);text-decoration:none;font-size:13px}
+.aiws-props .card{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--b);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.aiws-props .card:hover{border-color:#a5b4fc;box-shadow:0 4px 14px rgba(79,70,229,.08)}
+.aiws-props .kind{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:650;background:#eef2ff;color:#3730a3}
+.aiws-props .kind.danger{background:#fef2f2;color:var(--danger)}
+.aiws-props .status{float:right;font-size:11px;color:var(--muted)}
+.aiws-props .meta{color:var(--muted);font-size:12px;margin-top:8px}
+.aiws-props .empty{padding:40px;text-align:center;color:var(--muted);background:#fff;border:1px dashed var(--b);border-radius:12px}
+.aiws-props .partial{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;font-size:11px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}
+</style>
+<div class="aiws-props">
+  <a class="back" href="/manage/ai-workspace">← 返回工作区</a>
+  <h1>待确认修改清单</h1>
+  <p class="sub">AI 只会生成清单，不会直接改题库。点开清单核对每一项后，再由你确认执行；清单 5 分钟有效。</p>
+  {% if proposals and proposals.length %}
+    {% for p in proposals %}
+    <a class="card" href="/manage/ai-workspace/proposal/{{ p._id }}">
+      <span class="kind {% if p.kind === 'delete_duplicates' %}danger{% endif %}">
+        {% if p.kind === 'delete_duplicates' %}删除重复题{% elif p.kind === 'add_problems' %}新增题目{% else %}优化标签{% endif %}
+      </span>
+      <span class="status">{{ p.status }}</span>
+      <div style="margin-top:8px">{{ p.summary }}</div>
+      <div class="meta">
+        {{ p.items.length }} 项 · {{ p.createdAtText }}
+        {% if p.result and p.result.skipped and p.result.skipped > 0 %}
+        <span class="partial">部分执行：跳过 {{ p.result.skipped }} 项</span>
+        {% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  {% else %}
+  <div class="empty">还没有清单。在工作区里让 AI 分析重复题或标签，它会生成清单给你核对。</div>
+  {% endif %}
+</div>
+{% endblock %}

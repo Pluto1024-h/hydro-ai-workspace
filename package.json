@@ -1,0 +1,19 @@
+{
+  "name": "@local/hydro-ai-workspace",
+  "version": "0.7.2",
+  "description": "Hydro intelligent management workspace: AI-driven read-only tools for problems, contests, users and analytics, with human confirmation reserved for dangerous actions.",
+  "main": "index.ts",
+  "author": "chen hao",
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "hydrooj": "*"
+  },
+  "keywords": [
+    "hydrooj",
+    "hydro",
+    "addon",
+    "plugin",
+    "ai-workspace",
+    "management"
+  ]
+}

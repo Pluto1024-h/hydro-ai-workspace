@@ -1,0 +1,181 @@
+{% extends "manage_base.html" %}
+
+{% block manage_content %}
+<style>
+.aiws-settings {
+  --aiws-accent: #4f46e5;
+  --aiws-accent-dark: #3730a3;
+  --aiws-border: #e2e8f0;
+  --aiws-bg: #f8fafc;
+  --aiws-text: #0f172a;
+  --aiws-muted: #64748b;
+  max-width: 900px;
+  margin: 0 auto;
+  color: var(--aiws-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+.aiws-settings * { box-sizing: border-box; }
+.aiws-settings .aiws-settings__card {
+  background: #fff;
+  border: 1px solid var(--aiws-border);
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, .06);
+  overflow: hidden;
+}
+.aiws-settings .aiws-settings__head {
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%);
+  color: #fff;
+}
+.aiws-settings .aiws-settings__head h1 { margin: 0; font-size: 20px; font-weight: 650; }
+.aiws-settings .aiws-settings__head p { margin: 6px 0 0; font-size: 13px; opacity: .85; }
+.aiws-settings .aiws-settings__body { padding: 22px 24px 26px; }
+.aiws-settings .notice { border-radius: 8px; padding: 10px 14px; margin-bottom: 18px; font-size: 13px; }
+.aiws-settings .notice--success { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.aiws-settings .aiws-settings__group { margin-bottom: 22px; }
+.aiws-settings .aiws-settings__group-title {
+  font-size: 13px; font-weight: 650; color: var(--aiws-accent-dark);
+  text-transform: uppercase; letter-spacing: .04em;
+  margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--aiws-border);
+}
+.aiws-settings .aiws-settings__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; }
+.aiws-settings label { display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+.aiws-settings input[type="text"], .aiws-settings input[type="password"], .aiws-settings input[type="number"] {
+  width: 100%; padding: 9px 11px; border: 1px solid #cbd5e1; border-radius: 8px;
+  font-size: 14px; color: var(--aiws-text); background: #fff; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.aiws-settings input:focus { border-color: var(--aiws-accent); box-shadow: 0 0 0 3px rgba(79, 70, 229, .12); }
+.aiws-settings input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--aiws-accent); vertical-align: -2px; margin-right: 6px; }
+.aiws-settings .aiws-settings__hint { font-size: 12px; color: var(--aiws-muted); margin: 6px 0 0; }
+.aiws-settings .aiws-settings__switch {
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+  background: var(--aiws-bg); border: 1px solid var(--aiws-border); border-radius: 10px;
+}
+.aiws-settings .aiws-settings__switch label { margin: 0; font-size: 14px; }
+.aiws-settings .aiws-settings__actions { display: flex; gap: 10px; align-items: center; margin-top: 24px; }
+.aiws-settings .aiws-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 9px 18px; border-radius: 8px; border: 1px solid #cbd5e1;
+  background: #fff; color: #334155; text-decoration: none; font-size: 14px;
+  cursor: pointer; transition: filter .15s, background .15s;
+}
+.aiws-settings .aiws-btn:hover { filter: brightness(.96); text-decoration: none; }
+.aiws-settings .aiws-btn--primary { background: var(--aiws-accent); border-color: var(--aiws-accent); color: #fff; font-weight: 600; }
+.aiws-settings .aiws-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.aiws-settings .aiws-tools span {
+  display: inline-block; padding: 3px 9px; border-radius: 999px;
+  background: #eef2ff; color: var(--aiws-accent-dark); font-size: 12px;
+}
+@media (max-width: 640px) {
+  .aiws-settings .aiws-settings__grid { grid-template-columns: 1fr; }
+  .aiws-settings .aiws-settings__head, .aiws-settings .aiws-settings__body { padding: 16px; }
+}
+</style>
+
+<div class="aiws-settings">
+  <div class="aiws-settings__card">
+    <div class="aiws-settings__head">
+      <h1>模型配置</h1>
+      <p>DeepSeek API 通道设置 · 密钥仅保存在服务端，不会回显</p>
+    </div>
+    <div class="aiws-settings__body">
+      {% if notice %}
+      <div class="notice notice--{{ notice.type }}">{{ notice.message }}</div>
+      {% endif %}
+
+      <form method="post" action="/manage/ai-workspace/settings">
+
+        <div class="aiws-settings__group">
+          <h2 class="aiws-settings__group-title">通道</h2>
+          <div class="aiws-settings__switch">
+            <input type="checkbox" id="aiws-enabled" name="enabled" value="on" {% if enabled %}checked{% endif %}>
+            <label for="aiws-enabled">启用 AI 对话工作区</label>
+          </div>
+        </div>
+
+        <div class="aiws-settings__group">
+          <h2 class="aiws-settings__group-title">模型</h2>
+          <div class="aiws-settings__grid">
+            <div>
+              <label for="aiws-api-base">API Base URL</label>
+              <input type="text" id="aiws-api-base" name="apiBase" value="{{ apiBase }}" maxlength="200">
+            </div>
+            <div>
+              <label for="aiws-chat-model">对话模型</label>
+              <input type="text" id="aiws-chat-model" name="chatModel" value="{{ chatModel }}" maxlength="64" placeholder="deepseek-flash">
+              <p class="aiws-settings__hint">官方当前可用：deepseek-flash、deepseek-v4-pro</p>
+            </div>
+            <div>
+              <label for="aiws-validation-alias">二次校验别名</label>
+              <input type="text" id="aiws-validation-alias" name="validationAlias" value="{{ validationAlias }}" maxlength="64" placeholder="deepseek_pro">
+            </div>
+            <div>
+              <label for="aiws-validation-target">别名映射到的真实模型</label>
+              <input type="text" id="aiws-validation-target" name="validationTarget" value="{{ validationTarget }}" maxlength="64" placeholder="deepseek-flash">
+              <p class="aiws-settings__hint">deepseek_pro 只是内部别名，发请求前会替换成这里的模型名</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="aiws-settings__group">
+          <h2 class="aiws-settings__group-title">性能（2核2G 建议保持默认）</h2>
+          <div class="aiws-settings__grid">
+            <div>
+              <label for="aiws-timeout">超时（毫秒）</label>
+              <input type="number" id="aiws-timeout" name="timeoutMs" value="{{ timeoutMs }}" min="5000" max="120000" step="1000">
+            </div>
+            <div>
+              <label for="aiws-retries">重试次数</label>
+              <input type="number" id="aiws-retries" name="maxRetries" value="{{ maxRetries }}" min="0" max="3">
+            </div>
+            <div>
+              <label for="aiws-context">上下文消息数</label>
+              <input type="number" id="aiws-context" name="maxContextMessages" value="{{ maxContextMessages }}" min="4" max="16">
+            </div>
+          </div>
+        </div>
+
+        <div class="aiws-settings__group">
+          <h2 class="aiws-settings__group-title">API Key</h2>
+          <label for="aiws-api-key">DeepSeek API Key</label>
+          <input type="password" id="aiws-api-key" name="apiKey" autocomplete="new-password"
+                 placeholder="{% if apiKeySet %}当前状态：{{ apiKeyMasked }}；留空表示不修改{% else %}sk-...{% endif %}">
+          <p class="aiws-settings__hint">
+            {% if apiKeyFromEnv %}当前使用环境变量 HYDRO_AI_DEEPSEEK_KEY，优先级最高。{% else %}Key 不会回显；请妥善保管服务器配置。{% endif %}
+          </p>
+        </div>
+
+        <div class="aiws-settings__group">
+          <h2 class="aiws-settings__group-title">联网搜索（可选）</h2>
+          <label for="aiws-search-provider">搜索服务</label>
+          <select id="aiws-search-provider" name="searchProvider">
+            <option value="bocha" {% if searchProvider === 'bocha' %}selected{% endif %}>博查 BoCha（国内直连，中文搜索，推荐）</option>
+            <option value="tavily" {% if searchProvider === 'tavily' %}selected{% endif %}>Tavily（国际）</option>
+            <option value="serper" {% if searchProvider === 'serper' %}selected{% endif %}>Serper / Google</option>
+          </select>
+          <label for="aiws-search-base" style="margin-top:10px">接口地址（可留空用默认）</label>
+          <input type="text" id="aiws-search-base" name="searchApiBase" value="{{ searchApiBase }}" maxlength="200" placeholder="https://api.bochaai.com">
+          <label for="aiws-search-key" style="margin-top:10px">搜索 API Key</label>
+          <input type="password" id="aiws-search-key" name="searchApiKey" autocomplete="new-password"
+                 placeholder="{% if searchKeySet %}当前状态：{{ searchKeyMasked }}；留空表示不修改{% else %}留空则不启用搜索{% endif %}">
+          <p class="aiws-settings__hint">
+            {% if searchKeyFromEnv %}当前使用环境变量 HYDRO_AI_SEARCH_KEY，优先级最高。{% endif %}
+            不配 Key 时 AI 不能用 search_web，但仍可让你贴题目内容来生成草稿。不跑爬虫、不占内存。
+          </p>
+        </div>
+
+        <div class="aiws-settings__actions">
+          <button type="submit" class="aiws-btn aiws-btn--primary">保存配置</button>
+          <a class="aiws-btn" href="/manage/ai-workspace">返回工作区</a>
+        </div>
+      </form>
+
+      <div class="aiws-settings__group" style="margin-top:26px">
+        <h2 class="aiws-settings__group-title">已注册只读工具（{{ toolNames|length }}）</h2>
+        <div class="aiws-tools">{% for name in toolNames %}<span>{{ name }}</span>{% endfor %}</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

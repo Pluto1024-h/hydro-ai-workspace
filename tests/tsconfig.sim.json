@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": false,
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": [],
+    "rootDir": "..",
+    "outDir": "./.build",
+    "noEmitOnError": true
+  },
+  "files": [
+    "./hydro-stub.d.ts"
+  ],
+  "include": [
+    "../index.ts",
+    "../src/**/*.ts",
+    "../frontend/markdown.ts"
+  ]
+}
