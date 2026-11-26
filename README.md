@@ -15,7 +15,7 @@
 ```bash
 mkdir -p /root/.hydro/addons
 cd /root/.hydro/addons
-unzip -o /path/to/hydro-ai-workspace-v0.7.2.zip
+unzip -o hydro-ai-workspace-v0.7.2.zip
 
 # 首次安装
 hydrooj addon add /root/.hydro/addons/hydro-ai-workspace
