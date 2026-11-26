@@ -1,9 +1,5 @@
-# Hydro 智能管理平台插件（AI 工作区）
+# Hydro 智能管理平台插件
 
-> 当前阶段：**S4 · 标准题包自动生成与确认入库**（当前包 v0.7.2）。在配置页填 DeepSeek Key 后，用中文查询题库/比赛/用户、深度分析并建档；题库浏览、题面级查重、GESP 标签优化、联网搜索题目，并支持把整理好的标准题包**确认后自动建题（含测试数据）**。
->
-> **⚠️ 安全铁律**：AI **绝不直接**删除题目、修改标签或建题。所有写操作必须先生成"修改清单"，你在 `/manage/ai-workspace/proposals` 逐项核对、**勾选要执行的项目**（不想做的取消勾选即可）后亲自点确认；确认接口二次校验 sudo + 一次性令牌（绑定你本人、5 分钟有效）+ 勾选索引合法性，全程审计已执行与跳过项。删题会同时删除测试数据，不可恢复。
->
 > **v0.7.2 修复（"缺少必填参数 title"）**：根因是 `max_tokens` 被写死 **2048**——生成整个题包（题面+参考程序+14 组测试数据）的 JSON 远超此上限被**截断**，字段丢失；而参数解析器又把解析失败的 JSON **静默变成 `{}`**，于是错误显示成"缺少 title"，完全误导。修复：`max_tokens` 默认提高到 **8192**（可配置，上限 8192）；截断/损坏的 JSON 现在会**明确报错**并说明"很可能输出超限"，不再伪装成缺字段；缺参数提示会列出"本次实际收到哪些字段"；系统提示要求大数据一律用 generator、题面长时 testData 先给 6–8 个关键数据，宁可少而全。超时也从 30s 提到 60s（长题包生成更慢）。
 >
 > **v0.7.1 修复（题面读不到）**：`get_problem_detail` / `get_problem_full` 之前把题面正文只放进工具的 `data`（仅界面卡片可见），而模型**只能读 `summary`**——所以 AI 会如实说"只返回了摘要，拿不到题面原文"。更糟的是 `get_problem_full` 的摘要还写着"完整题面已在摘要中"，属于谎报。现在两个工具的摘要都会**直接嵌入题面正文**（detail 前 6000 字 / full 前 12000 字），并明确标注 `pid=` 与 `docId=`；`search_problems`/`browse_problems` 列表也会在编号不同时显示 `P2(docId=2)`，避免"这个编号到底是不是 pid"的困惑。新增回归测试第 29 项锁死"题面必须出现在摘要里"。
@@ -60,9 +56,7 @@
 
 完整计划：`C:\Users\16833\.workbuddy\plans\cosmic-forging-einstein-k_pV7KY_.md`
 
-阶段：S0 骨架 → S1 对话与 R0 → S2 高危确认闭环 → S3 分析深化 → **S4 自动生成题入库（当前）** → S5 比赛作业写操作与收尾。
-
-## 2. 环境要求（已按你的服务器实测）
+## 2. 环境要求
 
 - Node v24.14.0 / hydrooj 5.0.0-beta.18 / @hydrooj/ui-default 4.58.0-beta.21
 - 2 核 2G，Hydro + MongoDB + 判题同机，后台按单人使用设计
@@ -123,7 +117,7 @@ pm2 restart hydrooj
 | `search_web` | 联网搜索（需在配置页填搜索 API Key） |
 | `fetch_url` | 抓取单个网页正文（无需 Key；有 SSRF 防护与反爬页识别） |
 
-清单类（**只生成清单，AI 无权执行**）：
+清单类
 
 | 工具 | 能力 |
 |---|---|
@@ -131,7 +125,7 @@ pm2 restart hydrooj
 | `propose_update_tags` | 生成标签优化清单 |
 | `add_problem_draft` | 生成标准题包清单（题面/数据范围/标签/时限内存/分数/参考程序/样例/分类测试数据）；确认后建题并生成测试数据，**传 targetPid 则直接写入已有题目** |
 
-档案类（只写插件自有 `aiws_profile` 集合，**不改 Hydro 核心数据**）：
+档案类
 
 | 工具 | 能力 |
 |---|---|
@@ -154,21 +148,6 @@ pm2 restart hydrooj
 - 「查用户 42 最近失败的提交都是哪道题、什么原因」
 - 「分析用户 42 并建立档案」→ AI 自动依次调用 analyze_user → refresh_user_profile → 读档案 → 写个性化结论
 
-所有查询限 20–50 条 / 90 天 / `maxTimeMS(3000)`；档案分析单次最多读 500 条提交、200 道题，结果落库后重复查看不再计算。完整结果存前端卡片，只有摘要回喂模型——因此**所有需要后续操作的字段（题号、比赛 ID、UID）都必须写进摘要**，不能只放卡片。
-
-### 离线模拟测试（打包前必跑）
-
-```bash
-cd /path/to/hydro-ai-workspace
-npx tsc -p tests/tsconfig.sim.json     # 先编译到 tests/.build/
-node tests/simulate.js                 # 29 项常规回归
-node tests/selection_test.js           # 清单逐项勾选与索引校验
-node tests/dupe_stress.js             # 3000 题查重压力测试
-node tests/package_test.js            # 题包校验 / 真实 Python 执行 / 入库与回滚
-node tests/webfetch_test.js           # 网页抓取：SSRF 拦截、HTML 提取、反爬页识别
-node tests/tokens_test.js             # max_tokens 预算与截断/坏 JSON 报错
-```
-
 `simulate.js` 会用内存假数据库跑真实工具函数，覆盖：比赛 ID → 比赛题目难度 → 数字/字符串 pid 查题面 → 搜题 → 搜用户 → **按提交反查提交者 UID** → **全站 UID 分页清单** → 提交明细（含 rid） → 用户分析 → 建档 → 写结论 → sudo 校验 → 参数校验 → 工具重名 → 摘要长度 → 模板变量冲突 → 对话历史回放 → Markdown 表格渲染 → HTML 转义 → 源码与编译错误回喂 → GESP/知识点识别 → 题面级查重归一化 → 清单令牌五项校验 → 只读分析不改题库，共 30 项。任何一项失败都会打印具体原因并以非零码退出，**不要打包未全绿的版本**。
 
 ## 6. 对话体验说明
@@ -179,29 +158,6 @@ node tests/tokens_test.js             # max_tokens 预算与截断/坏 JSON 报�
 - 连续提问串行排队，不会并发打爆 DeepSeek 或 MongoDB。
 - 429 / 500 / 503 / 504 最多重试 2 次；超时 30 秒可配置。
 
-## 7. 验收清单
-
-1. 配置页保存 Key 后刷新只显示掩码；任何接口不回显完整 Key。
-2. 输入"列出最近 5 个比赛"出表格卡片；"查用户 xxx"无邮箱/哈希输出；"分析用户 42"出统计卡片，追问可沿用上下文。
-3. 工具 chip 与结果卡片可见；点"查看详情"能拉取 artifact 内容。
-4. 无效 Key 有清晰错误，不无限重试；连续两条提问排队执行。
-5. sudo 过期时接口返回 JSON 错误而不是 HTML；重新验证后恢复。
-6. `/manage/ai-workspace/probe` 仍可用，内存增量在 S0 基线之上保持 <150MB。
-
-## 8. 2 核 2G 同机建议
-
-```yaml
-# /etc/mongod.conf（修改前备份）
-storage:
-  wiredTiger:
-    engineConfig:
-      cacheSizeGB: 0.3
-```
-
-```bash
-NODE_OPTIONS=--max-old-space-size=1024
-# PM2: max_memory_restart: '900M', instances: 1, exec_mode: fork
-```
 
 ## 9. 安全说明
 
